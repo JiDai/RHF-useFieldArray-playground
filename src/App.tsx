@@ -59,24 +59,13 @@ export default function App() {
   });
 
   const methods = useForm<FormValues>({
-    mode: "onBlur",
+    mode: "onChange",
     resolver: yupResolver(schema),
     defaultValues: {
       cart: [{ name: "", amount: 0, qt: { a: null, b: null }, total: 0 }],
     },
   });
   renderCount++;
-
-  useEffect(() => {
-    async function test() {
-      try {
-        await schema.validate(methods.getValues());
-      } catch (error) {
-        console.log(error);
-      }
-    }
-    test();
-  }, [methods.getValues()]);
 
   useWatch({ name: "cart", control: methods.control });
 
