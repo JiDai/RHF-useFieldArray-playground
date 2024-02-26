@@ -59,7 +59,7 @@ export default function App() {
   });
 
   const methods = useForm<FormValues>({
-    mode: "onChange",
+    mode: "onSubmit",
     resolver: yupResolver(schema),
     defaultValues: {
       cart: [{ name: "", amount: 0, qt: { a: null, b: null }, total: 0 }],
