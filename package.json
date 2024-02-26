@@ -7,6 +7,8 @@
   "dependencies": {
     "@hookform/devtools": "2.0.0-beta.3",
     "react": "^18",
+    "yup": "0.32.11",
+    "@hookform/resolvers": "2.8.8",
     "react-dom": "^18",
     "react-hook-form": "7.36.1",
     "react-scripts": "^5"

@@ -3,7 +3,7 @@ import { useFieldArray, useFormContext } from "react-hook-form";
 import Input from "./Input";
 
 export default function Table({}) {
-  const { control, watch } = useFormContext();
+  const { control, watch, formState } = useFormContext();
   const { fields, append, prepend, remove } = useFieldArray({
     name: "cart",
     control,
@@ -29,12 +29,19 @@ export default function Table({}) {
               <Input type="number" name={`cart.${index}.amount`} />
             </label>
             <label>
-              <span>qt</span>
-              <Input type="number" name={`cart.${index}.qt`} />
+              <span>qta</span>
+              <Input type="number" name={`cart.${index}.qt.a`} />
+            </label>
+            <label>
+              <span>qtb</span>
+              <Input type="number" name={`cart.${index}.qt.b`} />
             </label>
             <label>
               <span>total</span>
-              <span>{watchCart[index].qt * watchCart[index].amount}</span>
+              <span>
+                {(watchCart[index].qt.a + watchCart[index].qt.b) *
+                  watchCart[index].amount}
+              </span>
             </label>
 
             <button type="button" onClick={() => remove(index)}>

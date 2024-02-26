@@ -15,12 +15,15 @@ export default function Input({
   });
 
   return (
-    <input
-      type={type}
-      id={field.name}
-      name={field.name}
-      value={field.value}
-      onChange={field.onChange}
-    />
+    <div>
+      <input
+        type={type}
+        id={field.name}
+        name={field.name}
+        defaultValue={field.value}
+        onChange={field.onChange}
+      />
+      <div>{fieldState.error?.message}</div>
+    </div>
   );
 }

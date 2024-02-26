@@ -1,53 +1,84 @@
-import {
-  Control,
-  useFieldArray,
-  useForm,
-  useWatch,
-  FormProvider,
-} from "react-hook-form";
+import { useEffect } from "react";
+import { useForm, useWatch, FormProvider } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as Yup from "yup";
+
 import Headers from "./Header";
 import Table from "./Table";
 import "./styles.css";
+import Input from "./Input";
 
 type FormValues = {
   cart: {
     name: string;
     amount: number;
-    qt: number;
+    qt: {
+      a: number | null;
+      b: number | null;
+    };
     total: number;
   }[];
 };
 
 let renderCount = 0;
 
-function getTotal(payload: FormValues["cart"]) {
-  let total = 0;
-
-  for (const item of payload) {
-    total = total + (Number.isNaN(item.amount) ? 0 : item.amount);
-  }
-
-  return total;
-}
-
-function TotalAmout({ control }: { control: Control<FormValues> }) {
-  const cartValues = useWatch({
-    control,
-    name: "cart",
+export default function App() {
+  const schema = Yup.object().shape({
+    email: Yup.string().required(),
+    cart: Yup.array().of(
+      Yup.object().shape({
+        name: Yup.string().required("name is required."),
+        amount: Yup.number().required("amount is required."),
+        qt: Yup.object().shape(
+          {
+            a: Yup.number()
+              .transform((val: string) =>
+                !isNaN(Number(val)) ? Number(val) : null,
+              )
+              .when(["b"], {
+                is: (b: number) => !b,
+                then: (schema) =>
+                  schema.typeError("Required").min(1, "A is Required"),
+                otherwise: (schema) => schema.nullable(),
+              }),
+            b: Yup.number()
+              .transform((val: string) =>
+                !isNaN(Number(val)) ? Number(val) : null,
+              )
+              .when(["a"], {
+                is: (a: number) => !a,
+                then: (schema) =>
+                  schema.typeError("Required").min(1, "Required"),
+                otherwise: (schema) => schema.nullable(),
+              }),
+          },
+          [["a", "b"]],
+        ),
+      }),
+    ),
   });
 
-  return <p>{getTotal(cartValues)}</p>;
-}
-
-export default function App() {
   const methods = useForm<FormValues>({
+    mode: "onBlur",
+    resolver: yupResolver(schema),
     defaultValues: {
-      cart: [{ name: "", amount: 0, qt: 1, total: 0 }],
+      cart: [{ name: "", amount: 0, qt: { a: null, b: null }, total: 0 }],
     },
   });
   renderCount++;
 
-  // const watchCart = watch("cart");
+  useEffect(() => {
+    async function test() {
+      try {
+        await schema.validate(methods.getValues());
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    test();
+  }, [methods.getValues()]);
+
+  useWatch({ name: "cart", control: methods.control });
 
   return (
     <div>
@@ -61,10 +92,15 @@ export default function App() {
             console.log("Submit data", data);
           })}
         >
+          <label>
+            <span>Email</span>
+            <Input type="text" name={`email`} />
+          </label>
+
           <Table />
-          <TotalAmout control={methods.control} />
 
           <p>{methods.formState.errors.cart?.root?.message}</p>
+
           <button type="submit">Submit</button>
         </form>
       </FormProvider>
