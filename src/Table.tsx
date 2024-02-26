@@ -1,9 +1,10 @@
 import React from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
+
 import Input from "./Input";
 
 export default function Table({}) {
-  const { control, watch, formState } = useFormContext();
+  const { control, watch } = useFormContext();
   const { fields, append, prepend, remove } = useFieldArray({
     name: "cart",
     control,
@@ -13,11 +14,12 @@ export default function Table({}) {
   });
 
   const watchCart = watch("cart");
-
   return (
     <>
       {fields.map((field, index) => {
-        // console.log(watchCart);
+        const total =
+          (watchCart[index].qt.a + watchCart[index].qt.b) *
+          watchCart[index].amount;
         return (
           <section key={field.id}>
             <label>
@@ -38,10 +40,7 @@ export default function Table({}) {
             </label>
             <label>
               <span>total</span>
-              <span>
-                {(watchCart[index].qt.a + watchCart[index].qt.b) *
-                  watchCart[index].amount}
-              </span>
+              <span>{isNaN(total) ? 0 : total}</span>
             </label>
 
             <button type="button" onClick={() => remove(index)}>
