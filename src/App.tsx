@@ -60,7 +60,15 @@ export default function App() {
 
   const methods = useForm<FormValues>({
     mode: "onSubmit",
-    resolver: yupResolver(schema),
+    resolver: async (data, context, options) => {
+      // you can debug your validation schema here
+      console.log("formData", data);
+      console.log(
+        "validation result",
+        await yupResolver(schema)(data, context, options),
+      );
+      return yupResolver(schema)(data, context, options);
+    },
     defaultValues: {
       cart: [{ name: "", amount: 0, qt: { a: null, b: null }, total: 0 }],
     },
